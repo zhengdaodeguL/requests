@@ -5,6 +5,7 @@ dev
 ---
 
 - \[Short description of non-trivial change.\]
+- Fixed Digest authentication when qop alternatives contain whitespace. (#7648)
 
 
 2.34.2 (2026-05-14)

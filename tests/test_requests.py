@@ -745,6 +745,24 @@ class TestRequests:
             os.environ["NETRC"] = old_netrc
             os.unlink(netrc_file)
 
+    @pytest.mark.parametrize(
+        ("qop", "supported"),
+        [("auth-int, auth", True), ("auth-int,auth", True), ("auth-int", False)],
+    )
+    def test_digest_qop_options(self, qop, supported):
+        auth = HTTPDigestAuth("user", "pass")
+        auth.init_per_thread_state()
+        auth._thread_local.chal = requests.utils.parse_dict_header(
+            f'realm="demo", nonce="nonce", qop="{qop}"'
+        )
+
+        header = auth.build_digest_header("GET", "https://example.test/private")
+        if supported:
+            assert header.startswith("Digest ")
+            assert 'qop="auth"' in header
+        else:
+            assert header is None
+
     def test_DIGEST_HTTP_200_OK_GET(self, httpbin):
         for authtype in self.digest_auth_algo:
             auth = HTTPDigestAuth("user", "pass")
