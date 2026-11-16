@@ -1421,6 +1421,19 @@ class TestRequests:
         cookie = jar.get(key, domain=domain1)
         assert cookie == value
 
+    def test_multiple_domains(self):
+        jar = requests.cookies.RequestsCookieJar()
+        assert jar.multiple_domains() is False
+
+        jar.set("a", "1", domain="example.com")
+        assert jar.multiple_domains() is False
+
+        jar.set("b", "2", domain="example.com")
+        assert jar.multiple_domains() is False
+
+        jar.set("c", "3", domain="other.com")
+        assert jar.multiple_domains() is True
+
     def test_cookie_duplicate_names_raises_cookie_conflict_error(self):
         key = "some_cookie"
         value = "some_value"
